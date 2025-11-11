@@ -1,0 +1,58 @@
+﻿@using System.Data
+@using System.Linq
+@model DataTable
+
+@{
+    ViewData["Title"] = "Permisos de usuario";
+    <a asp-action="Index"  class="btn btn-secondary">↩️ Volver</a>
+    int idUsuario = ViewBag.IdUsuario;
+    string nombreUsuario = ViewBag.NombreUsuario?.ToString() ?? "";
+
+    // Módulos fijos del sistema
+    var modulosSistema = new List<string> { "Usuarios", "Registro", "Impresiones", "Permisos" };
+
+    // Diccionario de permisos normalizado a minúsculas
+    var permisosExistentes = new Dictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
+    if (Model != null)
+    {
+        foreach (DataRow r in Model.Rows)
+        {
+            var nombre = r["modulo"]?.ToString()?.Trim().ToLower() ?? "";
+            bool acceso = false;
+            try { acceso = Convert.ToBoolean(r["acceso"]); } catch { acceso = false; }
+            if (!string.IsNullOrEmpty(nombre) && !permisosExistentes.ContainsKey(nombre))
+                permisosExistentes[nombre] = acceso;
+        }
+    }
+}
+
+<h2>Permisos del usuario @nombreUsuario</h2>
+
+<form asp-action="GuardarPermisos" method="post">
+    <input type="hidden" name="idUsuario" value="@idUsuario" />
+
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Módulo</th>
+                <th>Acceso</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var modulo in modulosSistema)
+            {
+                string moduloKey = modulo.ToLower();
+                bool acceso = permisosExistentes.ContainsKey(moduloKey) && permisosExistentes[moduloKey];
+
+                <tr>
+                    <td>@modulo</td>
+                    <td class="text-center">
+                        <input type="checkbox" name="modulos" value="@modulo" @(acceso ? "checked" : "") />
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <button type="submit" class="btn btn-primary">Guardar cambios</button>
+</form>

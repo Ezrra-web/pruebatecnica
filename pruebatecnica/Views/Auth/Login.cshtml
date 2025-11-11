@@ -1,0 +1,16 @@
+﻿@{
+    ViewBag.Title = "Login";
+}
+<h2>Iniciar Sesión</h2>
+
+<form method="post">
+    <label>Usuario:</label>
+    <input type="text" name="usuario" required />
+
+    <label>Contraseña:</label>
+    <input type="password" name="contrasena" required />
+
+    <button type="submit">Entrar</button>
+
+    <span style="color:red">@ViewBag.Mensaje</span>
+</form>

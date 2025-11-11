@@ -1,0 +1,36 @@
+﻿@model System.Data.DataTable
+<h2>👤 Usuarios</h2>
+
+<a class="btn btn-success mb-3" href="/Usuarios/Crear">Nuevo Usuario</a>
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Usuario</th>
+            <th>Status</th>
+            <th>Horario Inicio</th>
+            <th>Horario Fin</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (System.Data.DataRow row in Model.Rows)
+        {
+            <tr>
+                <td>@row["usuario"]</td>
+                <td>@row["status"]</td>
+                <td>@row["horarioInicio"]</td>
+                <td>@row["horarioFin"]</td>
+                <td>
+                    <a class="btn btn-primary btn-sm" href="/Usuarios/Editar/@row["idUsuario"]">Editar</a>
+                    <a class="btn btn-danger btn-sm" href="/Usuarios/Baja/@row["idUsuario"]"
+                       onclick="return confirm('¿Dar de baja este usuario?')">
+                        Baja
+                    </a>
+                </td>
+            </tr>
+        }
+       
+    </tbody>
+</table>
+<a href="/Home/Index" class="btn btn-secondary mt-3">Cancelar</a>

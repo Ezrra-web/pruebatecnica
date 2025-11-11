@@ -1,0 +1,62 @@
+﻿@{
+    ViewData["Title"] = "Configuración de Impresiones";
+    var modelo = Model as System.Data.DataRow;
+}
+
+<h2 class="mb-4">🖨️ Configuración de Impresiones</h2>
+<a asp-action="Index" asp-controller="Home" class="btn btn-secondary">↩️ Volver</a>
+<form asp-action="Guardar" method="post" enctype="multipart/form-data">
+    <div class="mb-3">
+        <label>Tamaño de hoja</label>
+        <select name="tamanoHoja" class="form-select">
+            @{
+                var tamanos = new[] { "A4", "Carta", "Oficio", "Legal", "A5", "Ticket" };
+                string actual = modelo?["tamanoHoja"]?.ToString() ?? "A4";
+            }
+            @foreach (var t in tamanos)
+            {
+                <option value="@t" selected="@(actual == t ? "selected" : null)">@t</option>
+            }
+        </select>
+    </div>
+
+    <div class="mb-3">
+        <label>Tipo de letra</label>
+        <select name="tipoLetra" class="form-select">
+            @{
+                var fuentes = new[] { "Helvetica", "Arial", "Times New Roman", "Courier", "Calibri" };
+                string fuenteActual = modelo?["tipoLetra"]?.ToString() ?? "Helvetica";
+            }
+            @foreach (var f in fuentes)
+            {
+                <option value="@f" selected="@(fuenteActual == f ? "selected" : null)">@f</option>
+            }
+        </select>
+    </div>
+    <div class="mb-3">
+        <label>Tamaño de letra</label>
+        <input type="number" name="tamanoLetra" class="form-control"
+               value="@(modelo?["tamanoLetra"]?.ToString() ?? "12")"
+               min="6" max="72" required />
+        <small class="text-muted">Debe estar entre 6 y 72 puntos.</small>
+    </div>
+    <div class="mb-3">
+        <label>Imagen de fondo (opcional)</label>
+        <input type="file" name="imagenFondoFile" class="form-control" accept="image/*" />
+
+        @if (modelo != null && !string.IsNullOrEmpty(modelo["imagenFondo"]?.ToString()))
+        {
+            <p class="mt-2 text-success">Imagen actual:</p>
+            <img src="~/uploads/@modelo["imagenFondo"]" alt="Fondo" class="img-thumbnail" style="max-width:300px;" />
+        }
+    </div>
+
+    <button type="submit" class="btn btn-primary">💾 Guardar configuración</button>
+
+   
+</form>
+
+@if (ViewBag.Mensaje != null)
+{
+    <div class="alert alert-success mt-3">@ViewBag.Mensaje</div>
+}

@@ -1,0 +1,29 @@
+﻿@{
+    ViewData["Title"] = "Permisos";
+    var usuarios = Model as System.Data.DataTable;
+}
+
+<h2>👤 Gestión de Permisos</h2>
+<a asp-action="Index" asp-controller="Home" class="btn btn-secondary">↩️ Volver</a>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Usuario</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (System.Data.DataRow row in usuarios.Rows)
+        {
+            <tr>
+                <td>@row["idUsuario"]</td>
+                <td>@row["usuario"]</td>
+                <td>
+                    <a href="@Url.Action("Editar", "Permisos", new { idUsuario = row["idUsuario"] })"
+                       class="btn btn-warning btn-sm">🔐 Modificar Permisos</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

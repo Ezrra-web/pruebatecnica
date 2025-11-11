@@ -1,0 +1,59 @@
+﻿
+@{
+    ViewData["Title"] = "Dashboard";
+}
+
+<h2 class="text-center mb-4">Módulos del Sistema</h2>
+
+<div class="row">
+    @if (User.HasClaim("permiso", "Usuarios"))
+    {
+        <div class="col-md-3 mb-3">
+            <a asp-controller="Usuarios" asp-action="Index" class="card text-center p-3 shadow">
+                <h4>👤 Usuarios</h4>
+            </a>
+        </div>
+    }
+
+    @if (User.HasClaim("permiso", "Impresiones"))
+    {
+        <div class="col-md-3 mb-3">
+            <a href="/Impresiones/Index" class="card text-center p-3 shadow">
+                <h4>🖨️ Impresiones</h4>
+            </a>
+        </div>
+    }
+
+    @if (User.HasClaim("permiso", "PDF"))
+    {
+        <div class="col-md-3 mb-3">
+            <a href="/PDF" class="card text-center p-3 shadow">
+                <h4>PDF</h4>
+            </a>
+        </div>
+    }
+
+    @if (User.HasClaim("permiso", "Permisos"))
+    {
+        <div class="col-md-3 mb-3">
+            <a href="/Permisos/Index" class="card text-center p-3 shadow">
+                <h4>🔐 Permisos</h4>
+            </a>
+        </div>
+    }
+   
+    @if (User.HasClaim("permiso", "Registro"))
+    {
+        <div class="col-md-3 mb-3">
+            <a href="/Registros/Index" class="card text-center p-3 shadow">
+                <h4>📋 Registro</h4>
+            </a>
+        </div>
+    }
+    
+
+    <li class="nav-item">
+        <a class="nav-link" href="/Auth/Logout">Cerrar sesión</a>
+    </li>
+
+</div>

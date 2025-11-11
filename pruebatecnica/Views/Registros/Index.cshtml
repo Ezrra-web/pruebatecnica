@@ -1,0 +1,62 @@
+﻿@using System.Data
+@model System.Data.DataTable
+@{
+    ViewData["Title"] = "Registros";
+}
+
+
+<h2>📋 Registros</h2>
+<div class="mb-3 text-end">
+    <a asp-action="Crear" class="btn btn-success">➕ Nuevo Registro</a>
+    <a asp-action="Index" asp-controller="Home" class="btn btn-secondary">↩️ Volver</a>
+</div>
+
+<form asp-action="DescargarMultiplesPDF" method="post">
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th><input type="checkbox" id="checkAll" /></th>
+                <th>ID</th>
+                <th>Nombre</th>
+                @* <th>Contrato</th>
+                <th>Saldo</th>
+                <th>Fecha</th>
+                <th>Teléfono</th> *@
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+        @foreach (DataRow row in Model.Rows)
+        {
+            <tr>
+                <td>
+                    <input type="checkbox" name="idsSeleccionados" value="@row["idRegistro"]" class="chkRegistro" />
+                </td>
+                <td>@row["idRegistro"]</td>
+                <td>@row["nombre"]</td>
+                @* <td>@row["contrato"]</td>
+                <td>@row["saldo"]</td>
+                <td>@Convert.ToDateTime(row["fecha"]).ToString("dd/MM/yyyy")</td>
+                <td>@row["telefono"]</td> *@
+                <td>
+                    <a asp-action="Editar" asp-route-id="@row["idRegistro"]" class="btn btn-warning btn-sm">✏️</a>
+                    <a asp-action="Borrar" asp-route-id="@row["idRegistro"]" class="btn btn-danger btn-sm">🗑️</a>
+                    <a asp-action="GenerarPDF" asp-route-id="@row["idRegistro"]" class="btn btn-primary btn-sm">📄</a>
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+
+    <button type="submit" class="btn btn-success">📦 Descargar seleccionados</button>
+</form>
+
+@section Scripts {
+<script>
+    // ✅ Seleccionar/deseleccionar todos los checkboxes
+    document.getElementById("checkAll").addEventListener("click", function () {
+        const checkboxes = document.querySelectorAll(".chkRegistro");
+        checkboxes.forEach(c => c.checked = this.checked);
+    });
+</script>
+}

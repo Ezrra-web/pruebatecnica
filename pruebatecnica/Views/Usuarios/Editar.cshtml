@@ -1,0 +1,47 @@
+﻿@model System.Data.DataRow
+
+
+
+<h2>Editar Usuario</h2>
+<form method="post">
+    <input type="hidden" name="idUsuario" value="@Model["idUsuario"]" />
+
+    <label>Usuario</label>
+    <input type="text" name="usuario" value="@Model["usuario"]" class="form-control" required />
+
+    <label>Contraseña (dejar igual si no cambia)</label>
+    <input type="password" name="contrasena" class="form-control" />
+
+    <label>Estatus</label>
+    @{
+        string estatus = Model["status"].ToString();
+        var opciones = new List<string> { "Activo", "cambiarpassword", "Baja" };
+    }
+
+    <select name="estatus" class="form-select">
+        @foreach (var op in opciones)
+        {
+            <option value="@op" selected="@(estatus == op)">
+                @op
+            </option>
+        }
+    </select>
+
+
+
+
+
+
+    <label>Horario Inicio</label>
+    <input type="time" class="form-control"
+           name="horarioInicio"
+           value="@TimeSpan.Parse(Model["horarioInicio"].ToString()).ToString(@"hh\:mm")" required />
+
+    <input type="time" class="form-control"
+           name="horarioFin"
+           value="@TimeSpan.Parse(Model["horarioFin"].ToString()).ToString(@"hh\:mm")" required />
+
+
+    <button class="btn btn-primary mt-3">Actualizar</button>
+    <a href="/Usuarios/Index" class="btn btn-secondary mt-3">Cancelar</a>
+</form>

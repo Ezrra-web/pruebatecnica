@@ -1,0 +1,18 @@
+﻿<h2>Crear Usuario</h2>
+
+<form method="post">
+    <label>Usuario</label>
+    <input type="text" name="usuario" class="form-control" required />
+
+    <label>Contraseña</label>
+    <input type="password" name="contrasena" class="form-control" required minlength="6" />
+
+    <label>Horario Inicio</label>
+    <input type="time" name="horarioInicio" class="form-control" required />
+
+    <label>Horario Fin</label>
+    <input type="time" name="horarioFin" class="form-control" required />
+
+    <button class="btn btn-success mt-3">Guardar</button>
+    <a class="btn btn-secondary mt-3" href="/Usuarios">Cancelar</a>
+</form>

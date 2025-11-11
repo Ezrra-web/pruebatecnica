@@ -1,0 +1,42 @@
+﻿@model System.Data.DataRow
+@{
+    ViewData["Title"] = "Editar Registro";
+}
+
+<div class="container mt-4">
+    <h2 class="mb-4 text-center">Editar Registro</h2>
+
+    <form asp-action="Editar" method="post" class="card p-4 shadow">
+        <input type="hidden" name="idRegistro" value="@Model["idRegistro"]" />
+
+        <div class="mb-3">
+            <label class="form-label">Nombre</label>
+            <input name="nombre" class="form-control" value="@Model["nombre"]" required />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Contrato</label>
+            <input name="contrato" class="form-control" value="@Model["contrato"]" required />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Saldo</label>
+            <input type="number" step="0.01" name="saldo" class="form-control" value="@Model["saldo"]" required />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Fecha</label>
+            <input type="date" name="fecha" class="form-control" value="@Convert.ToDateTime(Model["fecha"]).ToString("yyyy-MM-dd")" required />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Teléfono</label>
+            <input name="telefono" class="form-control" value="@Model["telefono"]" required />
+        </div>
+
+        <div class="text-center">
+            <button type="submit" class="btn btn-primary">💾 Guardar Cambios</button>
+            <a asp-action="Index" class="btn btn-secondary">↩️ Volver</a>
+        </div>
+    </form>
+</div>
