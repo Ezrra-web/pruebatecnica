@@ -1,19 +1,35 @@
-using Microsoft.AspNetCore.Authentication.Cookies;
+﻿using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc.Authorization;
 using pruebatecnica.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-builder.Services.AddControllersWithViews();
+// 🔧 Servicios
 builder.Services.AddSingleton<ConexionBD>();
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddSession();
+builder.Services.AddControllersWithViews(options =>
+{
+    var policy = new AuthorizationPolicyBuilder()
+        .RequireAuthenticatedUser()
+        .Build();
+    options.Filters.Add(new AuthorizeFilter(policy));
+});
+
+
+// 🔐 Autenticación con cookies
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {
-        options.LoginPath = "/Auth/Login";
+        options.LoginPath = "/Auth/Login";          // redirige si no hay sesión
+        options.AccessDeniedPath = "/Auth/Login";   // redirige si no tiene permisos
+        options.LogoutPath = "/Auth/Logout";
         options.ExpireTimeSpan = TimeSpan.FromHours(8);
+        options.SlidingExpiration = true;
     });
-builder.Services.AddSession();
-builder.Services.AddHttpContextAccessor();
+
+// 🔏 Autorización con políticas personalizadas
 builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy("Usuarios", policy =>
@@ -26,30 +42,29 @@ builder.Services.AddAuthorization(options =>
         policy.RequireClaim("permiso", "Impresiones"));
 });
 
-
-
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// 🚀 Middleware
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 
+
+
+// ⚠️ El orden correcto:
+app.UseSession();          // primero: habilita sesión
 app.UseRouting();
-app.UseAuthentication();
-app.UseAuthorization();
-
-app.UseSession();
-
+app.UseAuthentication();   // segundo: lee la cookie
+app.UseAuthorization();    // tercero: valida permisos
 
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Auth}/{action=Login}/{id?}");
 
 app.Run();
+

@@ -58,6 +58,14 @@ public class PermisosController : Controller
 
             db.EjecutarConsulta("EXEC SP_Permiso_Actualizar @idUsuario, @modulo, @acceso", parametros);
         }
+        SqlParameter[] pHist = {
+    new SqlParameter("@idUsuario", Convert.ToInt32(User.FindFirst("idUsuario")?.Value)),
+    new SqlParameter("@modulo", "Permisos"),
+    new SqlParameter("@accion", "Actualización"),
+    new SqlParameter("@descripcion", $"Actualizó permisos del usuario ID {idUsuario}")
+};
+        db.EjecutarConsulta("EXEC SP_Historico_Insertar @idUsuario, @modulo, @accion, @descripcion", pHist);
+
 
         return RedirectToAction("Index", new { idUsuario });
     }

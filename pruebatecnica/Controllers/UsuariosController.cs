@@ -23,7 +23,7 @@ public class UsuariosController : Controller
     public IActionResult Crear() => View();
 
     [HttpPost]
-    public IActionResult Crear(string usuario, string contrasena, TimeSpan horarioInicio, TimeSpan horarioFin)
+    public IActionResult Crear(int idUsuario ,string usuario, string contrasena, TimeSpan horarioInicio, TimeSpan horarioFin)
     {
         SqlParameter[] parametros =
         {
@@ -35,6 +35,13 @@ public class UsuariosController : Controller
         };
 
         db.EjecutarConsulta("EXEC SP_Usuario_Insertar @usuario, @contrasena, @estatus, @inicio, @fin", parametros);
+        SqlParameter[] pHist = {
+    new SqlParameter("@idUsuario", Convert.ToInt32(User.FindFirst("idUsuario")?.Value)),
+    new SqlParameter("@modulo", "Usuarios"),
+    new SqlParameter("@accion", "Crear"),
+    new SqlParameter("@descripcion", $"Creo usuario {usuario}")
+};
+        db.EjecutarConsulta("EXEC SP_Historico_Insertar @idUsuario, @modulo, @accion, @descripcion", pHist);
 
         return RedirectToAction("Index");
     }
@@ -69,14 +76,32 @@ public class UsuariosController : Controller
             "EXEC SP_Usuario_Actualizar @idUsuario, @usuario, @password, @status, @horarioInicio, @horarioFin",
             parametros
         );
+        SqlParameter[] pHist = {
+    new SqlParameter("@idUsuario", Convert.ToInt32(User.FindFirst("idUsuario")?.Value)),
+    new SqlParameter("@modulo", "Usuarios"),
+    new SqlParameter("@accion", "Actualización"),
+    new SqlParameter("@descripcion", $"Editó usuario {usuario}")
+};
+        db.EjecutarConsulta("EXEC SP_Historico_Insertar @idUsuario, @modulo, @accion, @descripcion", pHist);
+
 
         return RedirectToAction("Index");
     }
 
-    public IActionResult Baja(int id)
+    public IActionResult Baja(int idUsuario,int id)
     {
         SqlParameter[] parametros = { new SqlParameter("@idUsuario", id) };
         db.EjecutarConsulta("EXEC SP_Usuario_Eliminar @idUsuario", parametros);
+        SqlParameter[] pHist = {
+    new SqlParameter("@idUsuario", Convert.ToInt32(User.FindFirst("idUsuario")?.Value)),
+    new SqlParameter("@modulo", "Usuarios"),
+  
+    new SqlParameter("@accion", "Baja de usuario"),
+new SqlParameter("@descripcion", $"Dio de baja al usuario ID {id}")
+
+};
+        db.EjecutarConsulta("EXEC SP_Historico_Insertar @idUsuario, @modulo, @accion, @descripcion", pHist);
+
 
         return RedirectToAction("Index");
     }

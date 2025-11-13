@@ -7,7 +7,8 @@ using pruebatecnica.Models;
 using System.Data;
 using System.IO;
 using System.IO.Compression;
-[Authorize]
+
+[Authorize(Policy = "Registro")]
 public class RegistrosController : Controller
 {
     private readonly ConexionBD db;
@@ -30,6 +31,36 @@ public class RegistrosController : Controller
     [HttpPost]
     public IActionResult Crear(string nombre, string contrato, decimal saldo, DateTime fecha, string telefono)
     {
+        // 🔤 Validar que el nombre solo tenga letras y espacios
+        if (!System.Text.RegularExpressions.Regex.IsMatch(nombre ?? "", @"^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$"))
+        {
+            ViewBag.Mensaje = "❌ El nombre solo puede contener letras y espacios.";
+            return View("Crear"); // o la vista que uses
+        }
+
+        // 🔐 Validar que el contrato solo tenga letras y números (sin caracteres especiales)
+        if (!System.Text.RegularExpressions.Regex.IsMatch(contrato ?? "", @"^[a-zA-Z0-9]+$"))
+        {
+            ViewBag.Mensaje = "❌ El contrato solo puede contener letras y números, sin caracteres especiales.";
+            return View("Crear");
+        }
+
+        // 💰 Validar que el saldo no sea negativo
+        if (saldo < 0)
+        {
+            ViewBag.Mensaje = "❌ El saldo no puede ser negativo.";
+            return View("Crear");
+        }
+
+        // ☎️ Validar que el teléfono solo tenga números
+        if (!System.Text.RegularExpressions.Regex.IsMatch(telefono ?? "", @"^[0-9]+$"))
+        {
+            ViewBag.Mensaje = "❌ El teléfono solo puede contener números.";
+            return View("Crear");
+        }
+
+
+
         SqlParameter[] parametros =
         {
             new SqlParameter("@nombre", nombre),
@@ -39,6 +70,14 @@ public class RegistrosController : Controller
             new SqlParameter("@telefono", telefono)
         };
         db.EjecutarConsulta("EXEC SP_Registro_Insertar @nombre, @contrato, @saldo, @fecha, @telefono", parametros);
+        SqlParameter[] pHist = {
+    new SqlParameter("@idUsuario", Convert.ToInt32(User.FindFirst("idUsuario")?.Value)),
+    new SqlParameter("@modulo", "Registro"),
+    new SqlParameter("@accion", "Crear"),
+    new SqlParameter("@descripcion", $"Creo el registro del contrato {contrato}")
+};
+        db.EjecutarConsulta("EXEC SP_Historico_Insertar @idUsuario, @modulo, @accion, @descripcion", pHist);
+
         return RedirectToAction("Index");
     }
 
@@ -53,6 +92,36 @@ public class RegistrosController : Controller
     [HttpPost]
     public IActionResult Editar(int idRegistro, string nombre, string contrato, decimal saldo, DateTime fecha, string telefono)
     {
+        // 🔤 Validar que el nombre solo tenga letras y espacios
+        if (!System.Text.RegularExpressions.Regex.IsMatch(nombre ?? "", @"^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$"))
+        {
+            ViewBag.Mensaje = "❌ El nombre solo puede contener letras y espacios.";
+            return View("Crear"); // o la vista que uses
+        }
+
+        // 🔐 Validar que el contrato solo tenga letras y números (sin caracteres especiales)
+        if (!System.Text.RegularExpressions.Regex.IsMatch(contrato ?? "", @"^[a-zA-Z0-9]+$"))
+        {
+            ViewBag.Mensaje = "❌ El contrato solo puede contener letras y números, sin caracteres especiales.";
+            return View("Crear");
+        }
+
+        // 💰 Validar que el saldo no sea negativo
+        if (saldo < 0)
+        {
+            ViewBag.Mensaje = "❌ El saldo no puede ser negativo.";
+            return View("Crear");
+        }
+
+        // ☎️ Validar que el teléfono solo tenga números
+        if (!System.Text.RegularExpressions.Regex.IsMatch(telefono ?? "", @"^[0-9]+$"))
+        {
+            ViewBag.Mensaje = "❌ El teléfono solo puede contener números.";
+            return View("Crear");
+        }
+
+
+
         SqlParameter[] p =
         {
             new SqlParameter("@idRegistro", idRegistro),
@@ -63,13 +132,31 @@ public class RegistrosController : Controller
             new SqlParameter("@telefono", telefono)
         };
         db.EjecutarConsulta("EXEC SP_Registro_Actualizar @idRegistro, @nombre, @contrato, @saldo, @fecha, @telefono", p);
+        SqlParameter[] pHist = {
+    new SqlParameter("@idUsuario", Convert.ToInt32(User.FindFirst("idUsuario")?.Value)),
+    new SqlParameter("@modulo", "Registro"),
+    new SqlParameter("@accion", "Edición"),
+    new SqlParameter("@descripcion", $"Modificó registro ID {idRegistro}")
+};
+        db.EjecutarConsulta("EXEC SP_Historico_Insertar @idUsuario, @modulo, @accion, @descripcion", pHist);
+
         return RedirectToAction("Index");
     }
 
-    public IActionResult Eliminar(int id)
+    public IActionResult Eliminar(int idUsuario,int id)
     {
         SqlParameter[] p = { new SqlParameter("@idRegistro", id) };
         db.EjecutarConsulta("EXEC SP_Registro_Eliminar @idRegistro", p);
+        // 🔹 Registramos en el histórico
+        SqlParameter[] pHist = {
+            new SqlParameter("@idUsuario", Convert.ToInt32(User.FindFirst("idUsuario")?.Value)),
+            new SqlParameter("@modulo", "Registro"),
+            new SqlParameter("@accion", "Eliminación"),
+            new SqlParameter("@descripcion", $"Eliminó el registro  (ID {id})")
+        };
+
+        db.EjecutarConsulta("EXEC SP_Historico_Insertar @idUsuario, @modulo, @accion, @descripcion", pHist);
+
         return RedirectToAction("Index");
     }
     // 🔹 Generar un solo PDF con configuración de impresión

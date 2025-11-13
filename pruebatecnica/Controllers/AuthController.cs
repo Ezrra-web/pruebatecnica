@@ -1,11 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using pruebatecnica.Models;
-using Microsoft.Data.SqlClient;
-using Microsoft.AspNetCore.Authentication;
+﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Data.SqlClient;
+using pruebatecnica.Models;
 using System.Data;
-
+using System.Security.Claims;
+[AllowAnonymous]
 public class AuthController : Controller
 {
     private readonly ConexionBD db;
@@ -15,11 +16,22 @@ public class AuthController : Controller
         db = conexion;
     }
 
-    public IActionResult Logout()
+    public async Task<IActionResult> Logout()
     {
-        HttpContext.Session.Clear(); // ✅ Borra toda la sesión
+        // 🔐 Cierra la sesión de autenticación (cookie)
+        await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+
+        // 🧹 Limpia toda la sesión
+        HttpContext.Session.Clear();
+
+        // 🧽 Borra cookies residuales
+        Response.Cookies.Delete(".AspNetCore.Cookies");
+        Response.Cookies.Delete(".AspNetCore.Session");
+
+        // 🔁 Redirige al login
         return RedirectToAction("Login", "Auth");
     }
+
     public IActionResult CambiarPassword()
     {
         if (HttpContext.Session.GetInt32("CambiarPass_IdUsuario") == null)
@@ -69,7 +81,7 @@ public class AuthController : Controller
             HttpContext.Session.Remove("CambiarPass_IdUsuario");
 
             ViewBag.Mensaje = "✅ Contraseña actualizada correctamente. Inicie sesión.";
-            //
+            
             HttpContext.SignOutAsync();
             //return RedirectToAction("Login", "Usuarios");
             return View("Login");
@@ -159,6 +171,14 @@ public class AuthController : Controller
             await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
             HttpContext.Session.SetString("Usuario", usuario);
             HttpContext.Session.SetInt32("IdUsuario", idUsuario);
+            string queryHist = "EXEC SP_Historico_Insertar @idUsuario, @modulo, @accion, @descripcion";
+            SqlParameter[] pHist = {
+                new SqlParameter("@idUsuario", idUsuario),
+                new SqlParameter("@modulo", "Login"),
+                new SqlParameter("@accion", "Inicio sesión"),
+                new SqlParameter("@descripcion", $"Usuario {usuario} inició sesión correctamente")
+};
+            db.EjecutarConsulta(queryHist, pHist);
 
             return RedirectToAction("Index", "Home");
         }

@@ -40,7 +40,7 @@
                 <td>@row["telefono"]</td> *@
                 <td>
                     <a asp-action="Editar" asp-route-id="@row["idRegistro"]" class="btn btn-warning btn-sm">✏️</a>
-                    <a asp-action="Borrar" asp-route-id="@row["idRegistro"]" class="btn btn-danger btn-sm">🗑️</a>
+                    <a asp-action="Eliminar" asp-route-id="@row["idRegistro"]" class="btn btn-danger btn-sm">🗑️</a>
                     <a asp-action="GenerarPDF" asp-route-id="@row["idRegistro"]" class="btn btn-primary btn-sm">📄</a>
                 </td>
             </tr>
