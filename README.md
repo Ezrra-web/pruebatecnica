@@ -40,13 +40,23 @@ cd pruebatecnica
 
 ### 2. Configurar la Base de Datos
 
+**Opción 1: Script Completo con Datos Iniciales (Recomendado)**
 1. Abrir SQL Server Management Studio (SSMS)
 2. Crear una nueva base de datos llamada `pruebatecnica`
-3. Ejecutar el script completo `pruebatecnica.sql` que incluye:
+3. Ejecutar el script completo `pruebatecnica_completo.sql` que incluye:
    - Creación de todas las tablas
    - Definición de claves primarias y foráneas
    - Todos los Stored Procedures necesarios
    - Restricciones y valores por defecto
+   - **Usuario administrador con contraseña por defecto**
+   - **Permisos completos para el administrador**
+   - **Configuración de impresión por defecto**
+
+**Opción 2: Script Base + Datos Iniciales por Separado**
+1. Ejecutar primero `pruebatecnica.sql` (estructura de base de datos)
+2. Ejecutar después `datos_iniciales.sql` (usuario admin y configuración)
+
+**Ver guía detallada**: `INSTALACION_BASE_DATOS.md`
 
 ### 3. Configurar la Cadena de Conexión
 
@@ -81,9 +91,11 @@ O desde Visual Studio: presionar `F5` o hacer clic en el botón "Iniciar"
 
 Abrir el navegador en: `https://localhost:5001` o `http://localhost:5000`
 
-**Credenciales por defecto** (si se ejecutó el script de datos iniciales):
+**Credenciales por defecto** (creadas automáticamente por el script):
 - Usuario: `admin`
 - Contraseña: `admin123`
+
+**Nota importante**: El sistema solicitará cambiar la contraseña en el primer login por seguridad.
 
 ## 📁 Estructura del Proyecto
 

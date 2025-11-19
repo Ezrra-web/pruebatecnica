@@ -120,11 +120,34 @@ GO
 
 ## 🚀 Ejecución del Script SQL
 
-### Método 1: Usando SSMS (Recomendado)
+### Scripts Disponibles
+
+El proyecto incluye tres scripts SQL:
+
+1. **`pruebatecnica.sql`** - Script base con estructura de base de datos
+   - Tablas
+   - Stored Procedures
+   - Relaciones y restricciones
+
+2. **`datos_iniciales.sql`** - Script de datos iniciales
+   - Usuario administrador
+   - Permisos para el admin
+   - Configuración de impresión por defecto
+   - Registro de auditoría inicial
+
+3. **`pruebatecnica_completo.sql`** - Script completo (RECOMENDADO)
+   - Incluye todo de los scripts anteriores
+   - Instalación en un solo paso
+
+### Método 1: Script Completo (Recomendado)
+
+### Método 1: Script Completo (Recomendado)
+
+Este método instala todo en un solo paso.
 
 1. **Abrir el archivo SQL**
    - En SSMS, ir a: `File` → `Open` → `File...`
-   - Navegar a la ubicación de `pruebatecnica.sql`
+   - Navegar a la ubicación de `pruebatecnica_completo.sql`
    - Seleccionar y abrir el archivo
 
 2. **Verificar la conexión**
@@ -137,16 +160,43 @@ GO
 
 4. **Monitorear la ejecución**
    - La ventana de mensajes mostrará el progreso
-   - Esperar a que aparezca "Command completed successfully"
+   - Verás mensajes de creación de tablas, stored procedures y datos iniciales
+   - Al final mostrará:
+     ```
+     CREDENCIALES DE ACCESO:
+       Usuario: admin
+       Contraseña: admin123
+     ```
 
 5. **Verificar resultados**
    - Verificar que no haya errores en la ventana de mensajes
-   - Deben aparecer mensajes de creación de tablas y procedimientos
+   - Deben aparecer las credenciales del usuario administrador
 
-### Método 2: Usando línea de comandos (sqlcmd)
+### Método 2: Scripts por Separado
 
+Si prefieres instalar la estructura y datos por separado:
+
+1. **Ejecutar script de estructura**
+   - Abrir y ejecutar `pruebatecnica.sql`
+   - Esperar a que se creen todas las tablas y stored procedures
+
+2. **Ejecutar script de datos iniciales**
+   - Abrir y ejecutar `datos_iniciales.sql`
+   - Esperar a que se inserten los datos por defecto
+
+### Método 3: Usando línea de comandos (sqlcmd)
+
+### Método 3: Usando línea de comandos (sqlcmd)
+
+**Script completo:**
 ```batch
-sqlcmd -S localhost\SQLEXPRESS -i "ruta\al\archivo\pruebatecnica.sql" -o "log_instalacion.txt"
+sqlcmd -S localhost\SQLEXPRESS -i "ruta\al\archivo\pruebatecnica_completo.sql" -o "log_instalacion.txt"
+```
+
+**Scripts separados:**
+```batch
+sqlcmd -S localhost\SQLEXPRESS -i "ruta\al\archivo\pruebatecnica.sql" -o "log_estructura.txt"
+sqlcmd -S localhost\SQLEXPRESS -i "ruta\al\archivo\datos_iniciales.sql" -o "log_datos.txt"
 ```
 
 Donde:
@@ -334,45 +384,75 @@ Después de crear el usuario, actualizar `appsettings.json`:
 
 ---
 
-## 📊 Datos Iniciales (Opcional)
+## 📊 Datos Iniciales
 
-### Insertar Usuario Administrador
+Si ejecutaste `pruebatecnica_completo.sql`, los datos iniciales ya están insertados. Si ejecutaste solo `pruebatecnica.sql`, puedes agregar los datos iniciales de dos formas:
+
+### Opción A: Ejecutar script de datos iniciales
+
+```bash
+# En SSMS, abrir y ejecutar el archivo datos_iniciales.sql
+```
+
+### Opción B: Insertar manualmente (No recomendado - usar script)
+
+Los datos iniciales que se insertan son:
+
+**1. Usuario Administrador**
+- Usuario: `admin`
+- Contraseña: `admin123` 
+- Estado: `cambiarpassword` (forzará cambio en primer login)
+- Horario: 00:00:00 - 23:59:59 (acceso 24/7)
+
+**2. Permisos del Administrador**
+- Módulo Usuarios: ✓ Acceso completo
+- Módulo Registro: ✓ Acceso completo
+- Módulo Impresiones: ✓ Acceso completo
+- Módulo Permisos: ✓ Acceso completo
+
+**3. Configuración de Impresión por Defecto**
+- Tamaño de hoja: A4
+- Tipo de letra: Helvetica
+- Tamaño de letra: 12 puntos
+- Imagen de fondo: Ninguna
+
+**4. Registro de Auditoría**
+- Acción: Inicialización del sistema
+- Usuario: admin
+- Fecha: Fecha y hora de ejecución del script
+
+### Verificar Datos Insertados
+
+### Verificar Datos Insertados
 
 ```sql
 USE pruebatecnica;
 GO
 
--- Insertar usuario admin con contraseña "admin123"
-INSERT INTO usuarios (usuario, password, status, horarioInicio, horarioFin)
-VALUES ('admin', 'admin123', 'cambiarpassword', '00:00:00', '23:59:59');
+-- Verificar usuario admin
+SELECT * FROM usuarios WHERE usuario = 'admin';
 GO
 
--- Obtener el ID del usuario insertado
-DECLARE @idUsuario INT;
-SELECT @idUsuario = idUsuario FROM usuarios WHERE usuario = 'admin';
-
--- Insertar permisos completos para el admin
-INSERT INTO permisos (idUsuario, modulo, acceso)
-VALUES 
-    (@idUsuario, 'Usuarios', 1),
-    (@idUsuario, 'Registro', 1),
-    (@idUsuario, 'Impresiones', 1),
-    (@idUsuario, 'Permisos', 1);
+-- Verificar permisos del admin
+SELECT 
+    u.usuario,
+    p.modulo,
+    CASE WHEN p.acceso = 1 THEN 'Permitido' ELSE 'Denegado' END AS acceso
+FROM permisos p
+INNER JOIN usuarios u ON p.idUsuario = u.idUsuario
+WHERE u.usuario = 'admin';
 GO
 
--- Insertar configuración de impresión por defecto
-INSERT INTO config_impresion (tamanoHoja, tipoLetra, tamanoLetra, imagenFondo)
-VALUES ('A4', 'Helvetica', 12, NULL);
-GO
-
--- Verificar datos insertados
-SELECT * FROM usuarios;
-SELECT * FROM permisos;
+-- Verificar configuración de impresión
 SELECT * FROM config_impresion;
+GO
+
+-- Verificar registro de auditoría inicial
+SELECT * FROM historico WHERE modulo = 'Sistema';
 GO
 ```
 
-### Insertar Datos de Prueba
+### Insertar Datos de Prueba (Opcional)
 
 ```sql
 -- Insertar registros de prueba

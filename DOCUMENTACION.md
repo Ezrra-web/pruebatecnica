@@ -29,6 +29,17 @@ Guía detallada paso a paso para la instalación y configuración de la base de 
 
 ---
 
+### 3. [GUIA_SCRIPTS_SQL.md](GUIA_SCRIPTS_SQL.md) - Guía de Scripts SQL
+Documentación completa de los scripts SQL disponibles:
+- Scripts disponibles y sus diferencias
+- Comparación de características
+- Guía de instalación rápida
+- Datos iniciales incluidos
+- Verificación post-instalación
+- Solución de problemas específicos
+
+---
+
 ## 🗂️ Documentos por Tema
 
 ### 📊 Base de Datos
@@ -79,8 +90,11 @@ Guía detallada paso a paso para la instalación y configuración de la base de 
 
 ### Archivos Principales
 - **README.md**: Documentación principal (12 KB aprox.)
-- **INSTALACION_BASE_DATOS.md**: Guía de instalación de BD (8 KB aprox.)
-- **pruebatecnica.sql**: Script completo de base de datos (50 KB aprox.)
+- **INSTALACION_BASE_DATOS.md**: Guía de instalación de BD (9 KB aprox.)
+- **GUIA_SCRIPTS_SQL.md**: Documentación de scripts SQL (8 KB aprox.)
+- **pruebatecnica.sql**: Script base de base de datos (50 KB aprox.)
+- **datos_iniciales.sql**: Script de datos iniciales (5 KB aprox.)
+- **pruebatecnica_completo.sql**: Script completo con datos (55 KB aprox.)
 - **DOCUMENTACION.md**: Este archivo índice
 
 ### Código Fuente
@@ -98,6 +112,7 @@ Guía detallada paso a paso para la instalación y configuración de la base de 
 **Instalación**
 → [README.md](README.md) - Sección "Configuración del Proyecto"
 → [INSTALACION_BASE_DATOS.md](INSTALACION_BASE_DATOS.md) - Documento completo
+→ [GUIA_SCRIPTS_SQL.md](GUIA_SCRIPTS_SQL.md) - Información sobre los scripts
 
 **Base de Datos**
 → [README.md](README.md) - Sección "Base de Datos"
@@ -170,6 +185,10 @@ Guía detallada paso a paso para la instalación y configuración de la base de 
 - ✅ Actualizada sección de base de datos
 - ✅ Creado índice de documentación
 - ✅ Creada guía de instalación de base de datos
+- ✅ Agregado script `pruebatecnica_completo.sql` con datos iniciales
+- ✅ Agregado script `datos_iniciales.sql` separado
+- ✅ Creada guía completa de scripts SQL
+- ✅ Usuario administrador incluido en scripts
 
 ### Versión 1.0
 **Fecha**: Inicial
